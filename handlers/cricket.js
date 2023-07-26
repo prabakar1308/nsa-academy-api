@@ -5,14 +5,12 @@ exports.teams = async (req, res) => {
   const teamsRef = db
     .collection("teams")
     .where("clientId", "==", clientId || 0)
-    .orderBy("created", "desc");
+    .orderBy("name", "desc");
 
   try {
     teamsRef.get().then((snapshot) => {
-      const data = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
+      const data = snapshot.docs.map((doc) => doc.data());
+
       return res.status(200).json(data);
     });
   } catch (error) {
@@ -69,6 +67,17 @@ exports.createMatch = async (req, res) => {
     const id = req.body.matchId;
     const matchCollection = db.collection("matches");
     const response = await matchCollection.doc(id).set(req.body);
+    res.send(response);
+  } catch (error) {
+    res.send(error);
+  }
+};
+
+exports.deleteMatch = async (req, res) => {
+  try {
+    const id = req.params.matchId;
+    const matchCollection = db.collection("matches");
+    const response = await matchCollection.doc(id).delete();
     res.send(response);
   } catch (error) {
     res.send(error);
