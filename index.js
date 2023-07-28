@@ -11,6 +11,7 @@ const {
   deleteMatch,
 } = require("./handlers/cricket");
 const { db } = require("./utils/admin");
+const { validateLogin } = require("./handlers/generic");
 
 var app = express();
 
@@ -53,6 +54,8 @@ app.post("/cricket/create/match", createMatch);
 app.get("/cricket/matches/:clientId", getMatches);
 app.post("/cricket/update/players", updatePlayers);
 app.delete("/cricket/delete/match/:matchId", deleteMatch);
+
+app.get("/validate/login/:pin", validateLogin);
 
 app.listen(PORT, function () {
   console.log(`Demo project at: ${PORT}!`);
