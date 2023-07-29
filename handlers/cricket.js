@@ -1,4 +1,5 @@
 const { db, admin } = require("../utils/admin");
+const { updatePlayersInAlgolia } = require("./algolia");
 
 exports.teams = async (req, res) => {
   const clientId = req.params.clientId;
@@ -104,7 +105,8 @@ exports.getMatches = async (req, res) => {
 
 exports.updatePlayers = async (req, res) => {
   try {
-    const players = req.body.players;
+    const { players, algoliaIndex } = req.body;
+    updatePlayersInAlgolia(players, algoliaIndex);
     const firestore = admin.firestore();
     const batch = firestore.batch();
     players.forEach((player) => {
