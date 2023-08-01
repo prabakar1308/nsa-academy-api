@@ -9,6 +9,7 @@ const {
   getMatches,
   updatePlayers,
   deleteMatch,
+  getMatch,
 } = require("./handlers/cricket");
 const { db } = require("./utils/admin");
 const { validateLogin } = require("./handlers/generic");
@@ -52,6 +53,7 @@ app.post("/cricket/create/player", createPlayer);
 app.get("/cricket/getPlayers/:teamId", getPlayersByTeam);
 app.post("/cricket/create/match", createMatch);
 app.get("/cricket/matches/:clientId", getMatches);
+app.get("/cricket/match/:matchId", getMatch);
 app.post("/cricket/update/players", updatePlayers);
 app.delete("/cricket/delete/match/:matchId", deleteMatch);
 

@@ -85,6 +85,23 @@ exports.deleteMatch = async (req, res) => {
   }
 };
 
+exports.getMatch = async (req, res) => {
+  const matchId = req.params.matchId;
+  const teamsRef = db
+    .collection("matches")
+    .where("matchId", "==", matchId || 0);
+  try {
+    teamsRef.get().then((snapshot) => {
+      const data = snapshot.docs.map((doc) => doc.data());
+      return res.status(200).json(data);
+    });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ general: "Something went wrong, please try again" });
+  }
+};
+
 exports.getMatches = async (req, res) => {
   const clientId = req.params.clientId;
   const teamsRef = db
