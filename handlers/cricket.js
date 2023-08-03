@@ -49,7 +49,7 @@ exports.getPlayersByTeam = async (req, res) => {
   const collRef = db
     .collection("players")
     .where("teamId", "==", teamId || 0)
-    .orderBy("created", "desc");
+    .orderBy("name");
   try {
     collRef.get().then((snapshot) => {
       const data = snapshot.docs.map((doc) => doc.data());
@@ -122,8 +122,8 @@ exports.getMatches = async (req, res) => {
 
 exports.updatePlayers = async (req, res) => {
   try {
-    const { players, algoliaIndex } = req.body;
-    updatePlayersInAlgolia(players, algoliaIndex);
+    const { players, algoliaIndex, currentMatchPlayers } = req.body;
+    updatePlayersInAlgolia(currentMatchPlayers, algoliaIndex);
     const firestore = admin.firestore();
     const batch = firestore.batch();
     players.forEach((player) => {
