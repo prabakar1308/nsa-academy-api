@@ -16,7 +16,10 @@ const { validateLogin } = require("./handlers/generic");
 
 var app = express();
 
-app.use(bodyParser.json());
+app.use(bodyParser.json({ limit: "10mb" }));
+
+// app.use(express.json({ limit: "50mb" }));
+// app.use(express.bodyParser({ limit: "50mb" }));
 
 app.use(function (req, res, next) {
   // Website you wish to allow to connect
