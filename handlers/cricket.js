@@ -63,6 +63,34 @@ exports.getPlayersByTeam = async (req, res) => {
   }
 };
 
+exports.getPlayersByClient = async (req, res) => {
+  const clientId = req.params.clientId;
+  const teamsRef = db
+    .collection("teams")
+    .where("clientId", "==", clientId || []);
+
+  try {
+    teamsRef.get().then((snapshot) => {
+      const teamIds = snapshot.docs.map((doc) => doc.data());
+      console.log(teamIds);
+      const collRef = db
+        .collection("players")
+        .where("teamId", "in", teamIds.map((team) => team.id) || [])
+        .orderBy("name");
+
+      collRef.get().then((snapshot1) => {
+        const data = snapshot1.docs.map((doc) => doc.data());
+        // console.log(data);
+        return res.status(200).json(data);
+      });
+    });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ general: "Something went wrong, please try again" });
+  }
+};
+
 exports.createMatch = async (req, res) => {
   try {
     const id = req.body.matchId;
