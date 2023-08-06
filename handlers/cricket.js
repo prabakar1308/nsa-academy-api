@@ -1,4 +1,5 @@
 const { db, admin } = require("../utils/admin");
+const { updatePlayersInAlgolia } = require("./algolia");
 
 exports.teams = async (req, res) => {
   const clientId = req.params.clientId;
@@ -48,12 +49,48 @@ exports.getPlayersByTeam = async (req, res) => {
   const collRef = db
     .collection("players")
     .where("teamId", "==", teamId || 0)
-    .orderBy("created", "desc");
+    .orderBy("name");
   try {
     collRef.get().then((snapshot) => {
       const data = snapshot.docs.map((doc) => doc.data());
       // console.log(data);
       return res.status(200).json(data);
+    });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ general: "Something went wrong, please try again" });
+  }
+};
+
+exports.getPlayersByClient = async (req, res) => {
+  const clientId = req.params.clientId;
+  const teamsRef = db
+    .collection("teams")
+    .where("clientId", "==", clientId || []);
+
+  try {
+    teamsRef.get().then((snapshot) => {
+      const teamIds = snapshot.docs.map((doc) => doc.data());
+      console.log(teamIds);
+      if (teamIds.length > 0) {
+        const collRef = db
+          .collection("players")
+          .where(
+            "teamId",
+            "in",
+            teamIds.map((team) => team.id)
+          )
+          .orderBy("name");
+
+        collRef.get().then((snapshot1) => {
+          const data = snapshot1.docs.map((doc) => doc.data());
+          // console.log(data);
+          return res.status(200).json(data);
+        });
+      } else {
+        return res.status(200).json([]);
+      }
     });
   } catch (error) {
     return res
@@ -84,6 +121,23 @@ exports.deleteMatch = async (req, res) => {
   }
 };
 
+exports.getMatch = async (req, res) => {
+  const matchId = req.params.matchId;
+  const teamsRef = db
+    .collection("matches")
+    .where("matchId", "==", matchId || 0);
+  try {
+    teamsRef.get().then((snapshot) => {
+      const data = snapshot.docs.map((doc) => doc.data());
+      return res.status(200).json(data);
+    });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ general: "Something went wrong, please try again" });
+  }
+};
+
 exports.getMatches = async (req, res) => {
   const clientId = req.params.clientId;
   const teamsRef = db
@@ -104,7 +158,8 @@ exports.getMatches = async (req, res) => {
 
 exports.updatePlayers = async (req, res) => {
   try {
-    const players = req.body.players;
+    const { players, algoliaIndex, currentMatchPlayers } = req.body;
+    updatePlayersInAlgolia(currentMatchPlayers, algoliaIndex);
     const firestore = admin.firestore();
     const batch = firestore.batch();
     players.forEach((player) => {

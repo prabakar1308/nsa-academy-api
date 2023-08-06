@@ -9,13 +9,18 @@ const {
   getMatches,
   updatePlayers,
   deleteMatch,
+  getMatch,
+  getPlayersByClient,
 } = require("./handlers/cricket");
 const { db } = require("./utils/admin");
 const { validateLogin } = require("./handlers/generic");
 
 var app = express();
 
-app.use(bodyParser.json());
+app.use(bodyParser.json({ limit: "10mb" }));
+
+// app.use(express.json({ limit: "50mb" }));
+// app.use(express.bodyParser({ limit: "50mb" }));
 
 app.use(function (req, res, next) {
   // Website you wish to allow to connect
@@ -50,8 +55,10 @@ app.get("/cricket/teams/:clientId", teams);
 app.post("/cricket/create/team", createTeam);
 app.post("/cricket/create/player", createPlayer);
 app.get("/cricket/getPlayers/:teamId", getPlayersByTeam);
+app.get("/cricket/getAllPlayers/:clientId", getPlayersByClient);
 app.post("/cricket/create/match", createMatch);
 app.get("/cricket/matches/:clientId", getMatches);
+app.get("/cricket/match/:matchId", getMatch);
 app.post("/cricket/update/players", updatePlayers);
 app.delete("/cricket/delete/match/:matchId", deleteMatch);
 
