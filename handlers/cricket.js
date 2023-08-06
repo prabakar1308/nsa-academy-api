@@ -73,16 +73,24 @@ exports.getPlayersByClient = async (req, res) => {
     teamsRef.get().then((snapshot) => {
       const teamIds = snapshot.docs.map((doc) => doc.data());
       console.log(teamIds);
-      const collRef = db
-        .collection("players")
-        .where("teamId", "in", teamIds.map((team) => team.id) || [])
-        .orderBy("name");
+      if (teamIds.length > 0) {
+        const collRef = db
+          .collection("players")
+          .where(
+            "teamId",
+            "in",
+            teamIds.map((team) => team.id)
+          )
+          .orderBy("name");
 
-      collRef.get().then((snapshot1) => {
-        const data = snapshot1.docs.map((doc) => doc.data());
-        // console.log(data);
-        return res.status(200).json(data);
-      });
+        collRef.get().then((snapshot1) => {
+          const data = snapshot1.docs.map((doc) => doc.data());
+          // console.log(data);
+          return res.status(200).json(data);
+        });
+      } else {
+        return res.status(200).json([]);
+      }
     });
   } catch (error) {
     return res
