@@ -12,9 +12,22 @@ const {
   getMatch,
   getPlayersByClient,
 } = require("./handlers/cricket");
-const { db } = require("./utils/admin");
+// const { db, admin } = require("./utils/admin");
 const { validateLogin } = require("./handlers/generic");
 
+// Firebase initialize
+var admin = require("firebase-admin");
+
+var serviceAccount = require("./service-account.json");
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+});
+
+const db = admin.firestore();
+// module.exports = { admin, db };
+
+// express logic
 var app = express();
 
 app.use(bodyParser.json({ limit: "10mb" }));
@@ -51,18 +64,26 @@ app.get("/", (req, res) => {
   res.send("NSA Academy Server API is up & running");
 });
 
-app.get("/cricket/teams/:clientId", teams);
-app.post("/cricket/create/team", createTeam);
-app.post("/cricket/create/player", createPlayer);
-app.get("/cricket/getPlayers/:teamId", getPlayersByTeam);
-app.get("/cricket/getAllPlayers/:clientId", getPlayersByClient);
-app.post("/cricket/create/match", createMatch);
-app.get("/cricket/matches/:clientId", getMatches);
-app.get("/cricket/match/:matchId", getMatch);
-app.post("/cricket/update/players", updatePlayers);
-app.delete("/cricket/delete/match/:matchId", deleteMatch);
+app.get("/cricket/teams/:clientId", (req, res) => teams(req, res, db));
+app.post("/cricket/create/team", (req, res) => createTeam(req, res, db));
+app.post("/cricket/create/player", (req, res) => createPlayer(req, res, db));
+app.get("/cricket/getPlayers/:teamId", (req, res) =>
+  getPlayersByTeam(req, res, db)
+);
+app.get("/cricket/getAllPlayers/:clientId", (req, res) =>
+  getPlayersByClient(req, res, db)
+);
+app.post("/cricket/create/match", (req, res) => createMatch(req, res, db));
+app.get("/cricket/matches/:clientId", (req, res) => getMatches(req, res, db));
+app.get("/cricket/match/:matchId", (req, res) => getMatch(req, res, db));
+app.post("/cricket/update/players", (req, res) =>
+  updatePlayers(req, res, db, admin)
+);
+app.delete("/cricket/delete/match/:matchId", (req, res) =>
+  deleteMatch(req, res, db)
+);
 
-app.get("/validate/login/:pin", validateLogin);
+app.get("/validate/login/:pin", (req, res) => validateLogin(req, res, db));
 
 app.listen(PORT, function () {
   console.log(`Demo project at: ${PORT}!`);
