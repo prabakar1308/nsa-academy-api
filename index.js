@@ -13,7 +13,12 @@ const {
   getPlayersByClient,
 } = require("./handlers/cricket");
 // const { db, admin } = require("./utils/admin");
-const { validateLogin } = require("./handlers/generic");
+const {
+  validateLogin,
+  validateRegisterFields,
+  createClient,
+  deleteClient,
+} = require("./handlers/generic");
 
 // Firebase initialize
 var admin = require("firebase-admin");
@@ -83,7 +88,14 @@ app.delete("/cricket/delete/match/:matchId", (req, res) =>
   deleteMatch(req, res, db)
 );
 
-app.get("/validate/login/:pin", (req, res) => validateLogin(req, res, db));
+app.post("/validate/login", (req, res) => validateLogin(req, res, db));
+app.post("/register/validate", (req, res) =>
+  validateRegisterFields(req, res, db)
+);
+app.post("/client/create", (req, res) => createClient(req, res, db));
+app.delete("/client/delete/:clientId", (req, res) =>
+  deleteClient(req, res, db)
+);
 
 app.listen(PORT, function () {
   console.log(`Demo project at: ${PORT}!`);
