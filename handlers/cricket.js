@@ -1,7 +1,7 @@
-const { db, admin } = require("../utils/admin");
+// const { db, admin } = require("../index");
 const { updatePlayersInAlgolia } = require("./algolia");
 
-exports.teams = async (req, res) => {
+exports.teams = async (req, res, db) => {
   const clientId = req.params.clientId;
   const teamsRef = db
     .collection("teams")
@@ -21,7 +21,7 @@ exports.teams = async (req, res) => {
   }
 };
 
-exports.createTeam = async (req, res) => {
+exports.createTeam = async (req, res, db) => {
   try {
     const id = req.body.id;
     const teamsDb = db.collection("teams");
@@ -32,7 +32,7 @@ exports.createTeam = async (req, res) => {
   }
 };
 
-exports.createPlayer = async (req, res) => {
+exports.createPlayer = async (req, res, db) => {
   try {
     const id = req.body.id;
     const playersCollection = db.collection("players");
@@ -43,7 +43,7 @@ exports.createPlayer = async (req, res) => {
   }
 };
 
-exports.getPlayersByTeam = async (req, res) => {
+exports.getPlayersByTeam = async (req, res, db) => {
   const teamId = req.params.teamId;
   // console.log(teamId);
   const collRef = db
@@ -63,7 +63,7 @@ exports.getPlayersByTeam = async (req, res) => {
   }
 };
 
-exports.getPlayersByClient = async (req, res) => {
+exports.getPlayersByClient = async (req, res, db) => {
   const clientId = req.params.clientId;
   const teamsRef = db
     .collection("teams")
@@ -99,7 +99,7 @@ exports.getPlayersByClient = async (req, res) => {
   }
 };
 
-exports.createMatch = async (req, res) => {
+exports.createMatch = async (req, res, db) => {
   try {
     const id = req.body.matchId;
     const matchCollection = db.collection("matches");
@@ -110,7 +110,7 @@ exports.createMatch = async (req, res) => {
   }
 };
 
-exports.deleteMatch = async (req, res) => {
+exports.deleteMatch = async (req, res, db) => {
   try {
     const id = req.params.matchId;
     const matchCollection = db.collection("matches");
@@ -121,7 +121,7 @@ exports.deleteMatch = async (req, res) => {
   }
 };
 
-exports.getMatch = async (req, res) => {
+exports.getMatch = async (req, res, db) => {
   const matchId = req.params.matchId;
   const teamsRef = db
     .collection("matches")
@@ -138,7 +138,7 @@ exports.getMatch = async (req, res) => {
   }
 };
 
-exports.getMatches = async (req, res) => {
+exports.getMatches = async (req, res, db) => {
   const clientId = req.params.clientId;
   const teamsRef = db
     .collection("matches")
@@ -156,7 +156,7 @@ exports.getMatches = async (req, res) => {
   }
 };
 
-exports.updatePlayers = async (req, res) => {
+exports.updatePlayers = async (req, res, db, admin) => {
   try {
     const { players, algoliaIndex, currentMatchPlayers } = req.body;
     updatePlayersInAlgolia(currentMatchPlayers, algoliaIndex);
