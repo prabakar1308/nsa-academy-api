@@ -24,6 +24,7 @@ exports.validateLogin = async (req, res, db) => {
     } else {
       collRef
         .where("pin", "==", pin)
+        .where("phone", "==", phone)
         .where("status", "==", "approved")
         .get()
         .then((snapshot) => {
@@ -35,6 +36,7 @@ exports.validateLogin = async (req, res, db) => {
           } else {
             collRef
               .where("userPin", "==", pin)
+              .where("phone", "==", phone)
               .where("status", "==", "approved")
               .get()
               .then((snapshot) => {
